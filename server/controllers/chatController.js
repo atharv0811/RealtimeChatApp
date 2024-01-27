@@ -1,5 +1,6 @@
 const userDB = require('../models/userModel');
 const chatMemberModel = require('../models/chatMemberModel');
+const chatStorageModel = require('../models/chatStorageModel');
 const crypto = require('crypto');
 
 exports.addContact = async (req, res) => {
@@ -57,6 +58,22 @@ exports.getChatList = async (req, res) => {
     } catch (error) {
         console.log(error)
         return res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
+exports.addMessage = async (req, res) => {
+    try {
+        const messageText = req.body.data.messageText;
+        const senderId = req.user.id;
+
+        await chatStorageModel.create({
+            id: getRandomInt(100000, 999999),
+            messageText: messageText,
+            userDatumId: senderId
+        })
+        return res.status(201).json('success');
+    } catch (error) {
+        console.log(error)
     }
 }
 

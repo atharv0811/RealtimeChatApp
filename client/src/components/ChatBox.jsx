@@ -1,13 +1,26 @@
 import { SendOutlined } from '@ant-design/icons'
 import React, { useState } from 'react'
 import Avatar from './assets/avatar.svg'
+import axios from 'axios'
 
 const ChatBox = () => {
   const [menuVisible, setMenuVisible] = useState(false);
+  const [messageText, setMessageText] = useState('');
 
   const menuClick = () => {
     setMenuVisible(!menuVisible)
   }
+
+  const sendMessage = async (e) => {
+    e.preventDefault();
+    const data = { messageText: messageText };
+    await axios.post(`${process.env.REACT_APP_BACKEND_HOST_NAME}/chat/add-message`, { data }, {
+      headers: {
+        'Authorization': localStorage.getItem('chatToken')
+      }
+    });
+    setMessageText('')
+  };
 
   return (
     <div className='w-4/6 h-screen flex flex-col items-center max-[625px]:w-full max-[625px]:hidden'>
@@ -56,11 +69,13 @@ const ChatBox = () => {
           className="hidden"
         />
         <i className="fa-solid fa-paperclip text-lg ml-2 mr-5 cursor-pointer"></i>
-        <form className="flex w-full">
+        <form className="flex w-full" onSubmit={sendMessage}>
           <input
             type="text"
             placeholder="Type a message..."
             className="w-11/12 px-3 py-3 border rounded shadow-md bg-sky-100 focus:outline-none"
+            value={messageText}
+            onChange={(e) => setMessageText(e.target.value)}
           />
           <button
             type="submit"

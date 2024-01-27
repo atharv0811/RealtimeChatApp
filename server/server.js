@@ -8,6 +8,7 @@ const cors = require("cors");
 const chatRouter = require('./routes/chatRoutes');
 const userDB = require('./models/userModel');
 const ChatMembersData = require('./models/chatMemberModel');
+const chatStorageDb = require('./models/chatStorageModel');
 const port = 4000
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -21,6 +22,8 @@ app.use('/chat', chatRouter);
 
 userDB.hasMany(ChatMembersData);
 ChatMembersData.belongsTo(userDB);
+userDB.hasMany(chatStorageDb);
+chatStorageDb.belongsTo(userDB);
 
 sequelize.sync({ force: false }).then(() => {
     app.listen(port, () => {
