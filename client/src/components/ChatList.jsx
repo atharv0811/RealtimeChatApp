@@ -1,13 +1,15 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { PlusCircleOutlined } from '@ant-design/icons'
 import { Modal } from 'antd'
 import axios from 'axios'
+import Avatar from './assets/avatar.svg'
 
 const ChatList = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeButton, setActiveButton] = useState('contact');
     const [contactName, setContactName] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [chats, setChats] = useState([]);
     const [groupName, setGroupName] = useState('');
 
     const addContactModal = () => {
@@ -31,6 +33,23 @@ const ChatList = () => {
 
     };
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const token = localStorage.getItem('chatToken');
+                const result = await axios.get(`${process.env.REACT_APP_BACKEND_HOST_NAME}/chat/getChatList`, {
+                    headers: {
+                        "Authorization": token
+                    }
+                });
+                setChats(result.data);
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        fetchData();
+    }, [])
+
     return (
         <div className="w-2/6 h-screen bg-sky-100 max-[625px]:w-full max-[625px]:h-screen ">
             <div className="border-b-2 py-4 px-2 max-[625px]:mr-2">
@@ -43,20 +62,25 @@ const ChatList = () => {
             <div className="ml-5 mt-5 h-[73%] overflow-auto scrollbar-hide">
                 <div className="text-lg text-blue-500">Messages</div>
                 <div>
-                    {/* {chats.map(chat => {
-                        const latestMessageInfo = latestMessages.find(item => item.chatId === chat.id);
+                    {chats.map(chat => {
+                        // const latestMessageInfo = latestMessages.find(item => item.chatId === chat.id);
                         return (
-                            <div className="flex item-center my-6 cursor-pointer" onClick={() => chatClick(chat.memberId, chat.name, chat.type)}>
-                                <div className="p-0.5 bg-sky-600 rounded-full w-10 h-10">
-                                    <img src={'../assets/avatar.svg'} alt="" width={40} height={40} />
+                            <>
+                                <div className="flex item-center my-5 cursor-pointer"
+                                //  onClick={() => chatClick(chat.memberId, chat.name, chat.type)}
+                                >
+                                    <div className="p-0.5 bg-sky-600 rounded-full w-10 h-10">
+                                        <img src={Avatar} alt="" width={40} height={40} />
+                                    </div>
+                                    <div className="ml-5 flex items-center flex-col">
+                                        <h3 className="text-lg">{chat.name}</h3>
+                                        {/* <p className="text-xs">{latestMessageInfo ? latestMessageInfo.message : ''}</p> */}
+                                    </div>
                                 </div>
-                                <div className="ml-5 flex items-center flex-col">
-                                    <h3 className="text-lg">{chat.name}</h3>
-                                    <p className="text-xs">{latestMessageInfo ? latestMessageInfo.message : ''}</p>
-                                </div>
-                            </div>
+                                <hr className='border-t border-gray-400 mr-4' />
+                            </>
                         )
-                    })} */}
+                    })}
                 </div>
             </div>
 
